@@ -1,8 +1,15 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './Login.css';
 
 const Login = ({ onClose }) => {
+  const navigate = useNavigate();
+  const { login, register, error: authError } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -15,11 +22,66 @@ const Login = ({ onClose }) => {
       ...formData,
       [e.target.name]: e.target.value
     });
+    // Clear errors when user types
+    setError(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    setError(null);
+    setSuccess(null);
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        // Login
+        const result = await login(formData.email, formData.password);
+        if (result.success) {
+          setSuccess('Login successful! Redirecting...');
+          setTimeout(() => {
+            if (onClose) {
+              onClose();
+            } else {
+              navigate('/');
+            }
+            window.location.reload();
+          }, 1000);
+        } else {
+          setError(result.error || 'Login failed');
+        }
+      } else {
+        // Register
+        if (formData.password !== formData.confirmPassword) {
+          setError('Passwords do not match');
+          setLoading(false);
+          return;
+        }
+
+        const result = await register({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (result.success) {
+          setSuccess('Account created successfully! Redirecting...');
+          setTimeout(() => {
+            if (onClose) {
+              onClose();
+            } else {
+              navigate('/');
+            }
+            window.location.reload();
+          }, 1000);
+        } else {
+          setError(result.error || 'Registration failed');
+        }
+      }
+    } catch (err) {
+      setError(err.message || 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -74,6 +136,32 @@ const Login = ({ onClose }) => {
             </button>
           </div>
 
+          {error && (
+            <div className="error-message" style={{
+              padding: '0.75rem 1rem',
+              marginBottom: '1rem',
+              backgroundColor: '#fee',
+              color: '#c33',
+              borderRadius: '8px',
+              fontSize: '0.9rem'
+            }}>
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="success-message" style={{
+              padding: '0.75rem 1rem',
+              marginBottom: '1rem',
+              backgroundColor: '#efe',
+              color: '#3c3',
+              borderRadius: '8px',
+              fontSize: '0.9rem'
+            }}>
+              {success}
+            </div>
+          )}
+
           <form className="login-form" onSubmit={handleSubmit}>
             {!isLogin && (
               <div className="form-group">
@@ -86,6 +174,7 @@ const Login = ({ onClose }) => {
                   value={formData.name}
                   onChange={handleChange}
                   required={!isLogin}
+                  disabled={loading}
                 />
               </div>
             )}
@@ -100,6 +189,7 @@ const Login = ({ onClose }) => {
                 value={formData.email}
                 onChange={handleChange}
                 required
+                disabled={loading}
               />
             </div>
 
@@ -113,6 +203,8 @@ const Login = ({ onClose }) => {
                 value={formData.password}
                 onChange={handleChange}
                 required
+                disabled={loading}
+                minLength={6}
               />
             </div>
 
@@ -127,6 +219,8 @@ const Login = ({ onClose }) => {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required={!isLogin}
+                  disabled={loading}
+                  minLength={6}
                 />
               </div>
             )}
@@ -142,8 +236,8 @@ const Login = ({ onClose }) => {
               </div>
             )}
 
-            <button type="submit" className="submit-btn">
-              {isLogin ? 'Sign In' : 'Create Account'}
+            <button type="submit" className="submit-btn" disabled={loading}>
+              {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
             </button>
           </form>
 
