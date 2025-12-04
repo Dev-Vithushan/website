@@ -5,6 +5,7 @@ Backend API for Onsko Beauty e-commerce website built with Node.js, Express, and
 ## Features
 
 - 🔐 User Authentication (Register/Login with JWT)
+- 👥 User Management (Full CRUD operations)
 - 📦 Product Management (CRUD operations)
 - ❤️ Wishlist Functionality
 - 🛒 Shopping Cart Management
@@ -66,6 +67,15 @@ The server will run on `http://localhost:5000` by default.
 - `POST /api/auth/login` - Login user
 - `GET /api/auth/me` - Get current user (Protected)
 
+### Users
+- `GET /api/users` - Get all users (Admin only)
+- `GET /api/users/:id` - Get single user by ID (Admin or own profile)
+- `PUT /api/users/:id` - Update user (Admin or own profile)
+- `DELETE /api/users/:id` - Delete user (Admin only)
+- `PUT /api/users/:id/password` - Update user password (Own profile only)
+- `GET /api/users/profile/me` - Get current user profile (Protected)
+- `PUT /api/users/profile/me` - Update current user profile (Protected)
+
 ### Products
 - `GET /api/products` - Get all products (with optional query params: category, search, limit, page)
 - `GET /api/products/:id` - Get single product
@@ -124,6 +134,40 @@ curl -X POST http://localhost:5000/api/auth/login \
 curl http://localhost:5000/api/products
 ```
 
+### Get All Users (Admin only)
+```bash
+curl http://localhost:5000/api/users \
+  -H "Authorization: Bearer <admin-token>"
+```
+
+### Get Single User
+```bash
+curl http://localhost:5000/api/users/:userId \
+  -H "Authorization: Bearer <your-token>"
+```
+
+### Update User Profile
+```bash
+curl -X PUT http://localhost:5000/api/users/profile/me \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-token>" \
+  -d '{
+    "name": "Updated Name",
+    "email": "updated@example.com"
+  }'
+```
+
+### Update Password
+```bash
+curl -X PUT http://localhost:5000/api/users/:userId/password \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-token>" \
+  -d '{
+    "currentPassword": "oldpassword",
+    "newPassword": "newpassword123"
+  }'
+```
+
 ### Add to Cart (Protected)
 ```bash
 curl -X POST http://localhost:5000/api/cart \
@@ -139,6 +183,12 @@ curl -X POST http://localhost:5000/api/cart \
 
 ### User
 - name, email, password, role, createdAt
+
+**User CRUD Operations:**
+- Users can view and update their own profile
+- Admins can view, update, and delete any user
+- Password updates require current password verification
+- Users cannot change their own role (admin only)
 
 ### Product
 - name, category, price, description, color, image, inStock, stockQuantity, isNew, rating, numReviews, createdAt
