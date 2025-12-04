@@ -1,0 +1,84 @@
+/* Base animated section */
+.animated-section {
+  opacity: 0;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animated-section.visible {
+  opacity: 1;
+}
+
+/* Fade Up Animation */
+.animated-section.fade-up {
+  transform: translateY(60px);
+}
+
+.animated-section.fade-up.visible {
+  transform: translateY(0);
+}
+
+/* Fade Down Animation */
+.animated-section.fade-down {
+  transform: translateY(-60px);
+}
+
+.animated-section.fade-down.visible {
+  transform: translateY(0);
+}
+
+/* Fade Left Animation */
+.animated-section.fade-left {
+  transform: translateX(-60px);
+}
+
+.animated-section.fade-left.visible {
+  transform: translateX(0);
+}
+
+/* Fade Right Animation */
+.animated-section.fade-right {
+  transform: translateX(60px);
+}
+
+.animated-section.fade-right.visible {
+  transform: translateX(0);
+}
+
+/* Scale Up Animation */
+.animated-section.scale-up {
+  transform: scale(0.8);
+}
+
+.animated-section.scale-up.visible {
+  transform: scale(1);
+}
+
+/* Rotate In Animation */
+.animated-section.rotate-in {
+  transform: rotate(-10deg) scale(0.9);
+}
+
+.animated-section.rotate-in.visible {
+  transform: rotate(0) scale(1);
+}
+
+/* Blur In Animation */
+.animated-section.blur-in {
+  filter: blur(10px);
+  transform: scale(1.05);
+}
+
+.animated-section.blur-in.visible {
+  filter: blur(0);
+  transform: scale(1);
+}
+
+/* Slide Reveal Animation */
+.animated-section.slide-reveal {
+  clip-path: inset(0 100% 0 0);
+}
+
+.animated-section.slide-reveal.visible {
+  clip-path: inset(0 0 0 0);
+}
+
